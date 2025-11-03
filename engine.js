@@ -35,6 +35,14 @@ class FullEngine {
     const assets = (Array.isArray(this.config.assets) && this.config.assets.length) ? this.config.assets : (window.ENGINE_ASSETS || []);
     try { window.ENGINE_ASSETS = assets.slice(); } catch (e) {}
     this.wallImages = assets.map(src => loadImage(src));
+    // If textureSize wasn't specified in config, try to detect it from the first loaded image.
+    // This runs during p5 preload, so images will have their width/height available.
+    if (!this.config.textureSize) {
+      const firstImg = this.wallImages[0];
+      if (firstImg && firstImg.width && Number.isFinite(firstImg.width)) {
+        this.textureSize = firstImg.width;
+      }
+    }
     // optional floor/ceiling textures (paths provided via config.floorTexture / config.ceilingTexture)
     this.floorImage = this.config.floorTexture ? loadImage(this.config.floorTexture) : null;
     this.ceilingImage = this.config.ceilingTexture ? loadImage(this.config.ceilingTexture) : null;
@@ -126,7 +134,14 @@ class FullEngine {
     for (let px = 0; px < this.screenWidth; px += this.stripWidth) {
       const idx = Math.floor(px / this.stripWidth); const info = this.screenLines[idx]; if (!info) continue;
       fill(0); noStroke(); rect(px, info.top, this.stripWidth, info.height);
-      const img = this.wallImages[info.wallType - 1]; if (img) image(img, px, info.top, this.stripWidth, info.height, (64 * info.texX) / info.width, 0, this.stripWidth, 64);
+        const img = this.wallImages[info.wallType - 1]; 
+        if (img) {
+          // Prefer the actual image width/height if available (more robust detection),
+          // otherwise fall back to this.textureSize which may be set from config or detection.
+          const srcSize = (img.width && Number.isFinite(img.width)) ? img.width : this.textureSize;
+          const srcX = (srcSize * info.texX) / info.width;
+          image(img, px, info.top, this.stripWidth, info.height, srcX, 0, this.stripWidth, srcSize);
+        }
     }
   }
 

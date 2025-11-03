@@ -1,5 +1,9 @@
 let engineInstance = null;
 
+let startX = 25.5;
+let startY = 36.5;
+
+
 
 //플레이어 및 맵 기본 정보와 벽 데이터 불러오기
 function preload() {
@@ -21,14 +25,14 @@ function preload() {
     }
     // assets to load (textures)
     const assets = window.ENGINE_ASSETS && Array.isArray(window.ENGINE_ASSETS) && window.ENGINE_ASSETS.length ? window.ENGINE_ASSETS : [
-        'assets/blue_wall.png','assets/blue_cell.png','assets/rocks.png','assets/wood.png'
+        'assets/tile_basic.png','assets/0_Exits.png','assets/1_Exits.png','assets/2_Exits.png','assets/3_Exits.png','assets/4_Exits.png'
     ];
     config.assets = config.assets || assets.slice();
     // mirror to global for compatibility
     try { window.ENGINE_ASSETS = config.assets.slice(); } catch(e) {}
 
     // If user didn't provide player config, create default here
-    config.player = config.player || { x: 25.5, y: 33.5, rot: radians(180), moveSpeed: 0.1, rotSpeed: 3 * Math.PI / 180 };
+    config.player = config.player || { x: startX, y: startY, rot: radians(180), moveSpeed: 0.1, rotSpeed: 3 * Math.PI / 180 };
     //config.player = config.player || { x: 2, y: 2, rot: 300, moveSpeed: 0.1, rotSpeed: 3 * Math.PI / 180 };
     engineInstance = new FullEngine(config);
     window.engine = engineInstance;
@@ -65,7 +69,7 @@ function blockEvents(blockData){
         if( blockData<10 )
         {
             let x=engineInstance.getPlayerLocX()+17;
-            let y=engineInstance.getPlayerLocY()+24;
+            let y=engineInstance.getPlayerLocY()+27;
             switch(blockData){
                 case 1:
                     engineInstance.setWorldMap(basicMap1);
@@ -84,7 +88,7 @@ function blockEvents(blockData){
         else if( blockData<20 )
         {
             let x=engineInstance.getPlayerLocX()-3;
-            let y=(33.5-engineInstance.getPlayerLocY())+33.5;
+            let y=(startY-engineInstance.getPlayerLocY())+startY;
             let rot = engineInstance.getPlayerRot()-radians(180);
             switch(blockData){
                 case 11:
