@@ -4,6 +4,11 @@ let startX = 25.5;
 let startY = 36.5;
 
 let doorOpenSound;
+let chkAnomalyNum=0;
+let anomalyState=true;
+
+const myWorker = new Worker('worker.js');
+
 
 //플레이어 및 맵 기본 정보와 벽 데이터 불러오기
 function preload() {
@@ -20,7 +25,7 @@ function preload() {
             config.worldMap = window.worldMap.map(r => r.slice());
         } else {
             // fallback small sample map
-            config.worldMap = basicMap1.map(r => r.slice());
+            config.worldMap = basicMap.map(r => r.slice());
         }
     }
     // assets to load (textures)
@@ -42,7 +47,10 @@ function preload() {
         'assets/poster4.png',       // 15
         'assets/poster4_trans.png', // 16
         'assets/poster5.png',       // 17
-        'assets/poster5_trans.png'  // 18
+        'assets/poster5_trans.png', // 18
+        'assets/left_stairs.png',       // 19
+        'assets/center_stairs.png',       // 20
+        'assets/right_stairs.png'       // 21
     ];
 
     config.assets = config.assets || assets.slice();
@@ -57,7 +65,6 @@ function preload() {
     // call engine preload to load assets via p5.loadImage
     if (typeof engineInstance.preload === 'function') engineInstance.preload();
 
-    console.log("Hello World!");
     doorOpenSound = loadSound('assets/door_open_sound.mp3');
 }
 
@@ -76,35 +83,76 @@ function draw() {
     if (!engineInstance) return;
     // delegate to engine's frame renderer
     data = engineInstance.Go();
-    console.log(data);
 
     let blockData= engineInstance.getPlayerBlock()
     blockEvents(blockData)
 }
 
-function blockEvents(blockData){
+
+let chkI=0;
+async function blockEvents(blockData){
     if (!engineInstance) return;
     if(blockData!=0)
     {
         blockData*=-1;
         if( blockData<10 )
         {
-            let x=engineInstance.getPlayerLocX()+17;
-            let y=engineInstance.getPlayerLocY()+27;
+            let x=engineInstance.getPlayerLocX();
+            let y=engineInstance.getPlayerLocY();
+            let rot = engineInstance.getPlayerRot();
             switch(blockData){
                 case 1:
-                    engineInstance.setWorldMap(basicMap1);
-                    engineInstance.setPlayerLoc(x,y);
+                    if(anomalyState===true)
+                        chkAnomalyNum++;
+                    else if(anomalyState===false)
+                        chkAnomalyNum=0;
+                    x+=17;
+                    y+=27;
                 break;
                 case 2:
-                    engineInstance.setWorldMap(basicMap2);
-                    engineInstance.setPlayerLoc(x,y);
-                break;
-                case 3:
-                    engineInstance.setWorldMap(basicMap3);
-                    engineInstance.setPlayerLoc(x,y);
+                    if(anomalyState===true)
+                        chkAnomalyNum=0;
+                    else if(anomalyState===false)
+                        chkAnomalyNum++;
+                    x-=3;
+                    y=(startY-y)+startY;
+                    rot-=radians(180);
                 break;
             }
+            if(chkAnomalyNum==4)
+            {
+                basicMap[15][11] = 19;
+                basicMap[15][12] = 20;
+                basicMap[15][13] = 21;
+                basicMap[16][11] = -50;
+                basicMap[16][12] = -50;
+                basicMap[16][13] = -50;
+                setPosterBlock(1,false,true);
+                setPosterBlock(2,false,true);
+                setPosterBlock(3,false,true);
+                setPosterBlock(4,false,true);
+                setPosterBlock(5,false,true);
+                setDoorBlock(false, false);
+            }
+            else
+            {
+                anomalyState=random([true,false]);
+                if(anomalyState===true)
+                {
+                    //basicMap = await myWorker.postMessage(basicMap);
+                    console.log("anomaly true ",chkI++);
+                    setPosterBlock(1,random([true,false]),random([true,false]));
+                    setPosterBlock(2,random([true,false]),random([true,false]));
+                    setPosterBlock(3,random([true,false]),random([true,false]));
+                    setPosterBlock(4,random([true,false]),random([true,false]));
+                    setPosterBlock(5,random([true,false]),random([true,false]));
+                    setDoorBlock(random([true,false]), random([true,false]));
+                }
+            }
+            setExitBlock();
+            engineInstance.setWorldMap(basicMap);
+            engineInstance.setPlayerLoc(x,y);
+            engineInstance.setPlayerRot(rot);
         }
         else if( blockData<20 )
         {
@@ -133,16 +181,86 @@ function blockEvents(blockData){
         {
             switch(blockData){
                 case 21:
-                    engineInstance.setBlock(14, 18, 8); 
+                    engineInstance.setBlock(14, 20, 8); 
                     engineInstance.setBlock(13, 14, 0); 
                     engineInstance.setBlock(12, 14, 0); 
                     engineInstance.setBlock(11, 14, 0); 
+                    basicMap[14][13] = 0; 
+                    basicMap[14][12] = 0; 
+                    basicMap[14][11] = 0; 
                     doorOpenSound.play();
                 break;
             }
         }
+        else if(blockData==50)
+        {
+            //ending
+        }
     }
 }
+
+
+function setExitBlock(){
+    basicMap[29][17] = chkAnomalyNum+2;
+}
+
+    function setPosterBlock(num, trans, empty=false)
+    {
+        if(empty===true)
+        {
+            basicMap[12+num*2][10] = 1;
+            return;
+        }
+
+        switch(num){
+            case 1:
+                if(trans===true)
+                    basicMap[12][10] = 10;
+                else
+                    basicMap[12][10] = 9;
+                break;
+            case 2:
+                if(trans===true)
+                    basicMap[14][10] = 12;
+                else
+                    basicMap[14][10] = 11;
+                break;
+            case 3:
+                if(trans===true)
+                    basicMap[16][10] = 14;
+                else
+                    basicMap[16][10] = 13;
+                break;
+            case 4:
+                if(trans===true)
+                    basicMap[18][10] = 16;
+                else
+                    basicMap[18][10] = 15;
+                break;
+            case 5:
+                if(trans===true)
+                    basicMap[20][10] = 18;
+                else
+                    basicMap[20][10] = 17;
+                break;
+        }
+    }
+
+    function setDoorBlock(use, open=false)
+    {
+        if(use===false)
+        {
+            basicMap[20][14] = 1;
+            return;
+        }
+        basicMap[20][14] = 7;
+        if(open===true)
+        {
+            basicMap[14][13] = -21; 
+            basicMap[14][12] = -21; 
+            basicMap[14][11] = -21; 
+        }
+    }
 
 function keyPressed() {
     if (!engineInstance) return;
