@@ -4,6 +4,13 @@ let startX = 25.5;
 let startY = 36.5;
 
 let doorOpenSound;
+let bgm;
+let walkSound;
+
+let lastStepTime = 0;
+let stepInterval = 400;
+let walkState=0;
+
 let chkAnomalyNum = 0;
 let anomalyState = false;
 const MaxAnomalyNum = 4;
@@ -79,6 +86,8 @@ function preload() {
   if (typeof engineInstance.preload === "function") engineInstance.preload();
 
   doorOpenSound = loadSound("assets/door_open_sound.mp3");
+  bgm = loadSound("assets/bgm.wav");
+  walkSound = loadSound("assets/walk.wav");
 }
 
 //엔진이 가져와졌는지 체크
@@ -88,6 +97,9 @@ function setup() {
 
   if (typeof engineInstance.enableKeyboard === "function")
     engineInstance.enableKeyboard();
+
+  bgm.setLoop(true);
+  bgm.play();
 }
 
 let data = null;
@@ -95,6 +107,15 @@ let data = null;
 function draw() {
   if (!engineInstance) return;
   // delegate to engine's frame renderer
+
+  if( walkState > 0 ){
+    let now = millis();
+    if (now - lastStepTime > stepInterval) {
+      walkSound.play();
+      lastStepTime = now;
+    }
+  }
+
   data = engineInstance.Go();
 
   let blockData = engineInstance.getPlayerBlock();
@@ -257,13 +278,16 @@ function openDoor() {
 
 function keyPressed() {
   if (!engineInstance) return;
-//   if (key == "a" || key == "A") {
-//     if (data.frontBlock == 0) {
-//       engineInstance.setBlock(data.frontBlockX, data.frontBlockY, 3);
-//     } else if (data.frontBlock > 1) {
-//       engineInstance.setBlock(data.frontBlockX, data.frontBlockY, 0);
-//     }
-//   }
+  if (keyCode  ==  UP_ARROW || keyCode  ==  DOWN_ARROW) {
+    walkState++;
+  }
+}
+
+function keyReleased() {
+  if (!engineInstance) return;
+  if (keyCode  ==  UP_ARROW || keyCode  ==  DOWN_ARROW) {
+    walkState--;
+  }
 }
 
 // Optional: expose a small API to start/stop automatic rendering
