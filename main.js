@@ -251,17 +251,33 @@ function makeRandomAnomalyMap() {
   anomalyState = random([true, false, true]);
   if (anomalyState === true) {
     console.log("anomaly true ", chkI++);
-    setPosterBlock(1, random([true, false]), random([true, false]));
-    setPosterBlock(2, random([true, false]), random([true, false]));
-    setPosterBlock(3, random([true, false]), random([true, false]));
-    setPosterBlock(4, random([true, false]), random([true, false]));
-    setPosterBlock(5, random([true, false]), random([true, false]));
-    setDoorBlock(random([true, false]), random([true, false]));
-    setMister(random([true, false]));
+    maxChangeAnomalyNum = random([1, 2]);
+    randomAnomaly = [];
+    for (let i = 0; i < 7; i++) randomAnomaly.push(false);
+    for (let i = 0; i < maxChangeAnomalyNum; i++) randomAnomaly[i] = true;
+    randomAnomaly = shuffle(randomAnomaly);
+    setPosterBlock(1, randomAnomaly[0], false);
+    setPosterBlock(2, randomAnomaly[1], false);
+    setPosterBlock(3, randomAnomaly[2], false);
+    setPosterBlock(4, randomAnomaly[3], false);
+    setPosterBlock(5, randomAnomaly[4], false);
+    setDoorBlock(true, randomAnomaly[5]);
+    setMister(randomAnomaly[6]);
   } else {
-    setMister(misterState);
+    makeBasicMap();
   }
 }
+
+function makeBasicMap() {
+  setPosterBlock(1, false, false);
+  setPosterBlock(2, false, false);
+  setPosterBlock(3, false, false);
+  setPosterBlock(4, false, false);
+  setPosterBlock(5, false, false);
+  setDoorBlock(true, false);
+  setMister(false);
+}
+
 
 function setExitSignBlock() {
   basicMap[29][17] = chkAnomalyNum + 2;
