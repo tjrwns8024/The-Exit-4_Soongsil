@@ -238,22 +238,28 @@ function drawEndButton(onRestart) {
 }
 
 // -------------------------------------------------------
-// 클릭 처리 (외부 mousePressed에서 호출)
+// "다시 도전하기" 버튼이 눌렸는지 여부만 판단
 // -------------------------------------------------------
-function endScreenMousePressed(onRestart) {
-  if (!endState.showButton) return;
+// -------------------------------------------------------
+// "다시 도전하기" 버튼이 눌렸는지 여부만 판단 (마우스 좌표 전달)
+// -------------------------------------------------------
+function isEndRetryButtonClicked(mx, my) {
+  // 버튼이 아직 안 보이거나 충분히 나타나지 않았으면 false
+  if (!endState.showButton || endState.buttonAlpha < 250) {
+    return false;
+  }
 
   const x = width / 2;
   const y = height * 0.82;
   const w = END_BUTTON.w;
   const h = END_BUTTON.h;
 
-  const inside = mouseX >= x - w/2 &&
-                 mouseX <= x + w/2 &&
-                 mouseY >= y - h/2 &&
-                 mouseY <= y + h/2;
+  const inside =
+    mx >= x - w / 2 &&
+    mx <= x + w / 2 &&
+    my >= y - h / 2 &&
+    my <= y + h / 2;
 
-  if (inside && endState.buttonAlpha >= 250) {
-    onRestart();   // 콜백 실행
-  }
+  return inside;
 }
+
