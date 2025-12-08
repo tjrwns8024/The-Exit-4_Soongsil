@@ -25,6 +25,7 @@ const assets =
         "assets/left_stairs.png", // 19
         "assets/center_stairs.png", // 20
         "assets/right_stairs.png", // 21
+        "assets/dm.png", // 22
       ];
 
 const BASIC_TILE = 1;
@@ -48,3 +49,4 @@ const POSTER_5_TRANS = 18;
 const LEFT_STAIRS = 19;
 const CENTER_STAIRS = 20;
 const RIGHT_STAIRS = 21;
+const DM_LOGO = 22;

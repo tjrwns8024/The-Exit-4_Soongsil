@@ -20,7 +20,7 @@ const endState = {
   buttonAlpha: 0
 };
 
-const END_BUTTON = { w: 160, h: 20 };
+const END_BUTTON = { w: 500, h: 20 };
 
 // 애니메이션 타이밍(ms)
 const SENTENCE_FADE_DURATION = 700;
@@ -53,10 +53,12 @@ function endScreen(onRestart) {
   rect(0, 0, width, height);
   pop();
 
+  image(dmLogoImage, 0, 0, 100, 100);
+  
   // 상단 타이틀
   push();
   fill(240);
-  textSize(14);
+  textSize(48);
   textAlign(CENTER, TOP);
   text("탈출 성공", width / 2, height * 0.06);
   pop();
@@ -65,14 +67,14 @@ function endScreen(onRestart) {
   handleEndFadeIn();
 
   // 텍스트 중앙 정렬
-  const lineHeight = 26;
+  const lineHeight = 50;
   const totalLines = END_TEXTS.length;
   const centerY = height * 0.5;
   const firstLineY = centerY - ((totalLines - 1) * lineHeight) / 2;
 
   push();
   textAlign(CENTER, CENTER);
-  textSize(10);
+  textSize(32);
   textLeading(lineHeight);
   for (let i = 0; i < END_TEXTS.length; i++) {
     const alpha = endState.alphas[i];
@@ -205,8 +207,8 @@ function handleEndFadeIn() {
 function drawEndButton(onRestart) {
   const x = width / 2;
   const y = height * 0.82;
-  const w = END_BUTTON.w;
-  const h = END_BUTTON.h;
+  const w = width * 0.5;
+  const h = 64;
 
   const hover = mouseX >= x - w/2 &&
                 mouseX <= x + w/2 &&
@@ -226,13 +228,13 @@ function drawEndButton(onRestart) {
     noFill();
     stroke(0, endState.buttonAlpha);
     strokeWeight(2);
-    rect(0, 0, w, h, 10);
+    rect(0, 0, w, h, 50);
     pop();
   }
 
   fill(0, endState.buttonAlpha);
   textAlign(CENTER, CENTER);
-  textSize(8);
+  textSize(24);
   text("다시 도전하기", x, y);
   pop();
 }

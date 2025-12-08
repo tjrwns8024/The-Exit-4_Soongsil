@@ -18,6 +18,8 @@ let walkState = 0;
 let chkAnomalyNum = 0;
 let anomalyState = false;
 
+let dmLogoImage = null
+
 //아저씨 관련
 let misterLeftImage = [];
 let misterRightImage = [];
@@ -52,8 +54,8 @@ const OPEN_DOOR_EVENT_X = 11;
 const OPEN_DOOR_EVENT_Y = 14;
 
 const HELP_BTN = {
-  r: 6,   // 반지름
-  marginX: 24,
+  r: 16,   // 반지름
+  marginX: 20,
   marginY: 20
 };
 
@@ -66,11 +68,15 @@ function preload() {
     );
     return;
   }
+  
   // Build config (map, player, assets) here in main and pass to engine
   const config = window.ENGINE_CONFIG
     ? Object.assign({}, window.ENGINE_CONFIG)
     : {};
   // create or copy a world map here (prefer user-provided, otherwise copy any existing global map)
+
+  config.screenWidth = config.screenWidth || windowWidth;
+  config.screenHeight = config.screenHeight || windowHeight;
 
   if (!config.worldMap) {
     if (window.worldMap && Array.isArray(window.worldMap)) {
@@ -113,6 +119,8 @@ function preload() {
   misterRightImage[1] = loadImage("assets/misterRightTwo.png");
   misterBackImage[1] = loadImage("assets/misterFrontTwo.png");
   misterFrontImage[1] = loadImage("assets/misterBackTwo.png");
+
+  dmLogoImage = loadImage("assets/dm.png");
 }
 
 //엔진이 가져와졌는지 체크

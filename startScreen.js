@@ -11,11 +11,13 @@ function startScreen() {
   background(BG);
   pop();
 
+  image(dmLogoImage, 0, 0, 100, 100);
+
   // === 표지판 본체 (비율 스케일) ===
   const cx = width / 2;
   const cy = height * 0.5;
   const barW = width;
-  const barH = min(110, height * 0.3);
+  const barH = height * 0.2;
   const flicker = constrain(noise(t * 4.0) * 1.2 - 0.1, 0, 1);
 
   // 메인 바
@@ -28,15 +30,15 @@ function startScreen() {
 
   // 예: 좌측 가장자리에서 1.2배 크기로 흰색 표시
 // 남성: 왼쪽 가장자리 근처
-drawLeftStationCue(0, height * 0.5, 0.6, color(255));
+drawLeftStationCue(0, height * 0.5, 2, color(255));
 
 // 상도: 오른쪽 가장자리 근처
-drawRightStationCue(width, height * 0.5, 0.6, color(255));
+drawRightStationCue(width, height * 0.5, 2, color(255));
 
 
 
   // === 텍스트 (외곽 강조: 다중 드로우) ===
-  const baseK = barH / 100;
+  const baseK = barH / 80;
   const titleSize = 50 * baseK;
   const jitterAmt = (1.2 + flicker * 0.6) * baseK;
   const jx = random(-jitterAmt, jitterAmt);
@@ -190,17 +192,17 @@ function drawHelpButton() {
   circle(x, y, r * 2);
 
   // 테두리
-  stroke(200, 220);
+  stroke(200, 200);
   strokeWeight(1.5);
   noFill();
-  circle(x, y, r * 2 - 3);
+  circle(x, y, r * 2);
 
   // ? 글자
   noStroke();
   fill(230);
   textAlign(CENTER, CENTER);
   textStyle(BOLD);
-  textSize(r * 1.2);
+  textSize(r * 2);
   text("?", x, y);
   pop();
 }
